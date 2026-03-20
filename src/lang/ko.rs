@@ -3,7 +3,7 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
     [
         ("Status", "상태"),
         ("Your Desktop", "내 데스크탑"),
-        ("desk_tip", "이 ID와 비밀번호로 데스크탑에 액세스할 수 있습니다."),
+        ("desk_tip", "IP로 데스크탑에 액세스할 수 있습니다."),
         ("Password", "비밀번호"),
         ("Ready", "준비 완료"),
         ("Established", "연결됨"),
