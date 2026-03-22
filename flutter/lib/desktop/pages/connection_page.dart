@@ -305,6 +305,7 @@ class _ConnectionPageState extends State<ConnectionPage>
 Widget build(BuildContext context) {
   final isOutgoingOnly = bind.isOutgoingOnly();
   return Column(
+    mainAxisSize: MainAxisSize.min,
     children: [
       Row(
         children: [
