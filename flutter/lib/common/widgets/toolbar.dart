@@ -14,8 +14,6 @@ import 'package:flutter_hbb/models/platform_model.dart';
 import 'package:flutter_hbb/utils/multi_window_manager.dart';
 import 'package:get/get.dart';
 
-bool isEditOsPassword = false;
-
 class TTextMenu {
   final Widget child;
   final VoidCallback? onPressed;
@@ -63,30 +61,6 @@ class TToggleMenu {
       {required this.child, required this.value, required this.onChanged});
 }
 
-handleOsPasswordEditIcon(
-    SessionID sessionId, OverlayDialogManager dialogManager) {
-  isEditOsPassword = true;
-  showSetOSPassword(
-      sessionId, false, dialogManager, null, () => isEditOsPassword = false);
-}
-
-handleOsPasswordAction(
-    SessionID sessionId, OverlayDialogManager dialogManager) async {
-  if (isEditOsPassword) {
-    isEditOsPassword = false;
-    return;
-  }
-  final password =
-      await bind.sessionGetOption(sessionId: sessionId, arg: 'os-password') ??
-          '';
-  if (password.isEmpty) {
-    showSetOSPassword(sessionId, true, dialogManager, password,
-        () => isEditOsPassword = false);
-  } else {
-    bind.sessionInputOsPassword(sessionId: sessionId, value: password);
-  }
-}
-
 List<TTextMenu> toolbarControls(BuildContext context, String id, FFI ffi) {
   final ffiModel = ffi.ffiModel;
   final pi = ffiModel.pi;
@@ -104,35 +78,6 @@ List<TTextMenu> toolbarControls(BuildContext context, String id, FFI ffi) {
           child: Text(translate('Request Elevation')),
           onPressed: () =>
               showRequestElevationDialog(sessionId, ffi.dialogManager)),
-    );
-  }
-  // osAccount / osPassword
-  if (isDefaultConn && perms['keyboard'] != false) {
-    v.add(
-      TTextMenu(
-        child: Row(children: [
-          Text(translate(pi.isHeadless ? 'OS Account' : 'OS Password')),
-        ]),
-        trailingIcon: Transform.scale(
-          scale: (isDesktop || isWebDesktop) ? 0.8 : 1,
-          child: IconButton(
-            onPressed: () {
-              if (isMobile && Navigator.canPop(context)) {
-                Navigator.pop(context);
-              }
-              if (pi.isHeadless) {
-                showSetOSAccount(sessionId, ffi.dialogManager);
-              } else {
-                handleOsPasswordEditIcon(sessionId, ffi.dialogManager);
-              }
-            },
-            icon: Icon(Icons.edit, color: isMobile ? MyTheme.accent : null),
-          ),
-        ),
-        onPressed: () => pi.isHeadless
-            ? showSetOSAccount(sessionId, ffi.dialogManager)
-            : handleOsPasswordAction(sessionId, ffi.dialogManager),
-      ),
     );
   }
   // paste
@@ -154,68 +99,6 @@ List<TTextMenu> toolbarControls(BuildContext context, String id, FFI ffi) {
     v.add(TTextMenu(
         child: Text(translate('Reset canvas')),
         onPressed: () => ffi.cursorModel.reset()));
-  }
-
-  // https://github.com/rustdesk/rustdesk/pull/9731
-  // Does not work for connection established by "accept".
-  connectWithToken(
-      {bool isFileTransfer = false,
-      bool isViewCamera = false,
-      bool isTcpTunneling = false,
-      bool isTerminal = false}) {
-    final connToken = bind.sessionGetConnToken(sessionId: ffi.sessionId);
-    connect(context, id,
-        isFileTransfer: isFileTransfer,
-        isViewCamera: isViewCamera,
-        isTerminal: isTerminal,
-        isTcpTunneling: isTcpTunneling,
-        connToken: connToken);
-  }
-
-  if (isDefaultConn && isDesktop) {
-    v.add(
-      TTextMenu(
-          child: Text(translate('Transfer file')),
-          onPressed: () => connectWithToken(isFileTransfer: true)),
-    );
-    v.add(
-      TTextMenu(
-          child: Text(translate('View camera')),
-          onPressed: () => connectWithToken(isViewCamera: true)),
-    );
-    v.add(
-      TTextMenu(
-          child: Text('${translate('Terminal')} (beta)'),
-          onPressed: () => connectWithToken(isTerminal: true)),
-    );
-    v.add(
-      TTextMenu(
-          child: Text(translate('TCP tunneling')),
-          onPressed: () => connectWithToken(isTcpTunneling: true)),
-    );
-  }
-  // note
-  if (isDefaultConn && !bind.isDisableAccount()) {
-    v.add(
-      TTextMenu(
-          child: Text(translate('Note')),
-          onPressed: () async {
-            bool isLogin =
-                bind.mainGetLocalOption(key: 'access_token').isNotEmpty;
-            if (!isLogin) {
-              final res = await loginDialog();
-              if (res != true) return;
-              // Desktop: send message to main window to refresh login status
-              // Web: login is required before connection, so no need to refresh
-              // Mobile: same isolate, no need to send message
-              if (isDesktop) {
-                rustDeskWinManager.call(
-                    WindowType.Main, kWindowRefreshCurrentUser, "");
-              }
-            }
-            showAuditDialog(ffi);
-          }),
-    );
   }
   // divider
   if (isDefaultConn && (isDesktop || isWebDesktop)) {
