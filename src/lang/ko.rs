@@ -580,7 +580,7 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("Multiple Windows sessions found", "여러 Windows 세션이 발견되었습니다"),
         ("Please select the session you want to connect to", "연결할 세션을 선택해 주세요"),
         ("powered_by_me", "RustDesk 제공"),
-        ("outgoing_only_desk_tip", "이것은 맞춤형 에디션입니다.\n다른 장치에 연결할 수는 있지만 귀하의 기기에 연결할 수 없습니다."),
+        ("outgoing_only_desk_tip", "이것은 UHD 전용 입니다.\n다른 장치에 연결만 가능합니다."),
         ("preset_password_warning", "이 맞춤형 에디션에는 미리 설정된 비밀번호가 함께 제공됩니다. 이 비밀번호를 아는 사람이라면 누구나 기기를 완전히 제어할 수 있습니다. 예상치 못한 경우 즉시 소프트웨어를 제거하세요."),
         ("Security Alert", "보안 경고"),
         ("My address book", "내 주소록"),
