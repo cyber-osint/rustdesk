@@ -153,20 +153,6 @@ class _OnlineStatusWidgetState extends State<OnlineStatusWidget> {
     ).paddingOnly(right: isIncomingOnly ? 8 : 0);
   }
 
-  _buildConnStatusMsg() {
-    widget.onSvcStatusChanged?.call();
-    return Text(
-      _svcStopped.value
-          ? translate("Service is not running")
-          : stateGlobal.svcStatus.value == SvcStatus.connecting
-              ? translate("connecting_status")
-              : stateGlobal.svcStatus.value == SvcStatus.notReady
-                  ? translate("not_ready_status")
-                  : translate('Ready'),
-      style: TextStyle(fontSize: em),
-    );
-  }
-
   updateStatus() async {
     final status =
         jsonDecode(await bind.mainGetConnectStatus()) as Map<String, dynamic>;
